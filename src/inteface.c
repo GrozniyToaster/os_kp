@@ -6,6 +6,7 @@
 #include <zmq.h>
 
 #include "structs.h"
+#include "game.h"
 
 #define SQ_HEIGHT 7
 #define SQ_WIDTH 9
@@ -168,6 +169,10 @@ int core_turn(core* c, int pos, parts* p, char who) {
     }
     if (who == c->my_side) {
         send_move(x, y, p, c);
+        c->is_my_turn = false;
+    }
+    else {
+        c->is_my_turn = true;
     }
     return NO_WIN;
 }
@@ -241,6 +246,27 @@ void check_task(core* c, parts* p) {
 }
 
 
+
+
+int kbhit(void) {
+    int ch, r;
+    nodelay(stdscr, true);
+
+    ch = getch();
+    if (ch == ERR) {
+        r = false;
+    }
+    else {
+        r = true;
+        ungetch(ch);
+    }
+
+    nodelay(stdscr, false);
+    return r;
+}
+
+
+
 void interface(void* information) {
     player_info* info = information;
     parts this_interface;
@@ -252,6 +278,11 @@ void interface(void* information) {
     highlight_square(sq, &this_interface);
     do {
         check_task(&my_core, &this_interface);
+
+        if (!kbhit()) {
+            continue;
+        }
+
         key = getch();
         if (key == '+' && sq < 9) {
             draw_square(sq, 0, &this_interface);
@@ -261,21 +292,20 @@ void interface(void* information) {
             if (!my_core.is_my_turn) {
                 //TODO print 
                 continue;
-            }
-            if (core_turn(&my_core, sq, &this_interface, my_core.my_side)) {
-                //TODO check which turn
-                draw_square(sq, my_core.my_side, &this_interface);
-                highlight_square(sq, &this_interface);
-                if (my_core.win) {
+                    }
+                if (core_turn(&my_core, sq, &this_interface, my_core.my_side)) {
+                    //TODO check which turn
+                    draw_square(sq, my_core.my_side, &this_interface);
+                    highlight_square(sq, &this_interface);
+                    if (my_core.win) {
                     //TODO congratulations
                 }
             }
-        }
-        else if (key == '-' && sq > 0) {
+        }else if (key == '-' && sq > 0) {
             draw_square(sq, 0, &this_interface);
             highlight_square(--sq, &this_interface);
-        }
-        else {
+        }else {
+            //TODO
         }
     } while ((key != 'q') && (key != 'Q'));
 }
