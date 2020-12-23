@@ -1,20 +1,4 @@
-#define _XOPEN_SOURCE 700
-
-#include <stdlib.h>
-#include <ncurses.h>
-#include <assert.h>
-#include <zmq.h>
-
-#include "structs.h"
 #include "game.h"
-
-#define SQ_HEIGHT 7
-#define SQ_WIDTH 9
-#define BOARD_SIZE 9
-
-#define NO_WIN 2
-#define WIN 1
-#define CANT_SET 0
 
 typedef struct {
     WINDOW* BOARD[10];
@@ -22,6 +6,7 @@ typedef struct {
     void* INTEFACE_CONTEXT;
     void* TO_ROUTER;
     void* TASKS;
+    bool chat_is_enabled;
 } parts;
 
 
@@ -213,6 +198,8 @@ void interface_initialise(parts* to_init, core* c, player_info* info) {
     clear();
     refresh();
     create_board(to_init);
+
+    to_init->chat_is_enabled=false;
 }
 
 void parse(message* m, core* c, parts* p) {
@@ -245,9 +232,11 @@ void check_task(core* c, parts* p) {
     }
 }
 
-
-
-
+/**
+ * @brief check is keyboard hit (key was pressed )
+ * 
+ * @return int (true or false)
+ */
 int kbhit(void) {
     int ch, r;
     nodelay(stdscr, true);
@@ -265,6 +254,15 @@ int kbhit(void) {
     return r;
 }
 
+void chat_enable( parts* p  ){
+    p->chat_is_enabled = true;
+    char buf[BUF_SIZE];
+    echo();
+    mvwgetnstr(p->BOARD[9], SQ_HEIGHT * 3-2, 1,buf, BUF_SIZE);
+    printf("get:%s", buf);
+    mvwprintw( p->BOARD[9], SQ_HEIGHT * 3-2, 1, "get: %s\n", buf );
+}
+
 
 
 void interface(void* information) {
@@ -273,8 +271,8 @@ void interface(void* information) {
     core my_core;
     interface_initialise(&this_interface, &my_core, info);
     int key;
-    int sq;
-    sq = 0;
+    int sq = 0;
+    
     highlight_square(sq, &this_interface);
     do {
         check_task(&my_core, &this_interface);
@@ -286,14 +284,18 @@ void interface(void* information) {
         key = getch();
         if (key == '+' && sq < 9) {
             draw_square(sq, 0, &this_interface);
-            highlight_square(++sq, &this_interface);
+            ++sq;
+            highlight_square(sq, &this_interface);
+            if ( sq == 9  ){
+                chat_enable( &this_interface  );
+            }
         }
         else if (key == ' ' && sq < 9) {
             if (!my_core.is_my_turn) {
                 //TODO print 
                 continue;
-                    }
-                if (core_turn(&my_core, sq, &this_interface, my_core.my_side)) {
+            }
+            if (core_turn(&my_core, sq, &this_interface, my_core.my_side)) {
                     //TODO check which turn
                     draw_square(sq, my_core.my_side, &this_interface);
                     highlight_square(sq, &this_interface);

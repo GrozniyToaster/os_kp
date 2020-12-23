@@ -11,8 +11,6 @@
 
 #define MORE_DATA 1
 
-
-
 typedef enum {
     REPLY,
     RECONNECT,
