@@ -59,7 +59,10 @@ typedef struct {
 typedef struct {
     bool is_my_turn;
     char my_figure;
+    char client_type[20];
 } player_info;
+
+void player_info_initialise(player_info* pl, char figure, const char* type);
 
 void zmq_message_init(zmq_msg_t* mes, int sender, int recipient, int lastowner, Command command, char* data, int moreData, int messageID);
 

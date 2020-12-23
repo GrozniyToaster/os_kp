@@ -222,25 +222,21 @@ void interface(void* information) {
     parts this_interface;
     core my_core;
     interface_initialise(&this_interface, &my_core, info);
-
     int key;
     int sq;
     sq = 0;
     highlight_square(sq, &this_interface);
-
     do {
         check_task(&my_core, &this_interface);
         key = getch();
         //TODO ПЕРЕПИСАТЬ СВИЧИ
-        if ((key == '+' || key == '=') && sq < 9) {
+        if (key == '+' && sq < 9) {
             draw_square(sq, 0, &this_interface);
             highlight_square(++sq, &this_interface);
-
         }
         else if (key == ' ' && sq < 9) {
             if (!my_core.is_my_turn) {
                 //TODO print 
-
             }
             if (core_turn(&my_core, sq, &this_interface, my_core.my_side)) {
                 //TODO check which turn
@@ -252,31 +248,10 @@ void interface(void* information) {
             }
         }
         else if (key == '-' && sq > 0) {
-
             draw_square(sq, 0, &this_interface);
             highlight_square(--sq, &this_interface);
-
-
         }
         else {
-
-
         }
-
     } while ((key != 'q') && (key != 'Q'));
 }
-    //y_board();
-
-
-
-
-
-/*
-
-int main() {
-    player_info kek;
-    kek.is_my_turn = true;
-    kek.my_figure = 'x';
-            rface(&kek);
-
-*/

@@ -12,11 +12,10 @@ target_link_libraries( server PRIVATE
     pthread
     zmq
 )
-target_link_libraries( client PUBLIC
+target_link_libraries( client PRIVATE
     pthread
     zmq
     ncurses
 )
 
 
-include(CPack)
