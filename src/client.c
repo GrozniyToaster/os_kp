@@ -81,10 +81,10 @@ int main() {
     pthread_attr_init(&attr);
 
     player_info serv_info, client_info;
-    player_info_initialise(&client_info, 'x', "client");
+    player_info_initialise(&client_info, 'o', "client");
     pthread_create(&server_connect, &attr, (void*)router_module, &client_info);
 
-    //interface(&client_info);
+    interface(&client_info);
 
     pthread_join(server_connect, NULL);
 }

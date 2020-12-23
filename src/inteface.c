@@ -44,6 +44,7 @@ void draw(WINDOW* w, char  what) {
     else {
         return;
     }
+    wrefresh(w);
 }
 
 void draw_square(int sq, char what, parts* where) {
@@ -149,6 +150,7 @@ void send_move(int x, int y, parts* p, core* c) {
     message_standart(&to_send, 402, 1, TURN, data);
     zmq_msg_send(&to_send, p->TO_ROUTER, 0);
     zmq_msg_close(&to_send);
+
 }
 
 int core_turn(core* c, int pos, parts* p, char who) {
@@ -157,13 +159,16 @@ int core_turn(core* c, int pos, parts* p, char who) {
     if (c->board[x][y] != ' ' && who == c->my_side) {
         return CANT_SET;
     }
-    c->board[x][y] = c->my_side;
+    c->board[x][y] = who;
+    draw_square(pos, who, p);
     c->win = check_board(c, x, y);
     if (c->win) {
         send_win(p);
         return c->win;
     }
-    send_move(x, y, p, c);
+    if (who == c->my_side) {
+        send_move(x, y, p, c);
+    }
     return NO_WIN;
 }
 
@@ -184,8 +189,10 @@ void interface_initialise(parts* to_init, core* c, player_info* info) {
     assert(control == 0);
 
     to_init->TASKS = zmq_socket(to_init->INTEFACE_CONTEXT, ZMQ_SUB);
+    assert(to_init->TASKS != NULL);
     control = zmq_connect(to_init->TASKS, tasks_sock_name);
     assert(control == 0);
+    zmq_setsockopt(to_init->TASKS, ZMQ_SUBSCRIBE, 0, 0);
 
     initialise_core(c, info);
 
@@ -208,9 +215,10 @@ void parse(message* m, core* c, parts* p) {
         char ch;
         int x, y;
         sscanf(m->data, "%c%d%d", &ch, &x, &y);
-        printf("Inteface %s\n", m->data);
+        //printf("Inteface  %d \n",x * 3 + y);
 
         core_turn(c, x * 3 + y, p, ch);
+
     }
     else if (m->type == OPPONENT_WIN) {
         //TODO OPPONENT WIN
@@ -224,6 +232,7 @@ void check_task(core* c, parts* p) {
     zmq_msg_init_size(&to_recv, sizeof(message));
     int size = zmq_msg_recv(&to_recv, p->TASKS, ZMQ_DONTWAIT);
     if (size > 0) {
+        //printf("Toparse\n");
         message recv;
         memcpy(&recv, zmq_msg_data(&to_recv), sizeof(message));
         parse(&recv, c, p);
@@ -244,7 +253,6 @@ void interface(void* information) {
     do {
         check_task(&my_core, &this_interface);
         key = getch();
-        //TODO ПЕРЕПИСАТЬ СВИЧИ
         if (key == '+' && sq < 9) {
             draw_square(sq, 0, &this_interface);
             highlight_square(++sq, &this_interface);
@@ -252,6 +260,7 @@ void interface(void* information) {
         else if (key == ' ' && sq < 9) {
             if (!my_core.is_my_turn) {
                 //TODO print 
+                continue;
             }
             if (core_turn(&my_core, sq, &this_interface, my_core.my_side)) {
                 //TODO check which turn

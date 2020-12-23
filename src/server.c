@@ -41,7 +41,7 @@ int main() {
 	pthread_attr_init(&attr);
 
 	player_info serv_info, client_info;
-	player_info_initialise(&client_info, 'o', "server");
+	player_info_initialise(&client_info, 'x', "server");
 	pthread_create(&server_connect, &attr, (void*)router_module, &client_info);
 
 	interface(&client_info);
