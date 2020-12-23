@@ -145,7 +145,7 @@ void send_win(parts* p) {
 void send_move(int x, int y, parts* p, core* c) {
     zmq_msg_t to_send;
     char data[256];
-    sprintf(data, "%c%d%d", c->my_side, x, y);
+    sprintf(data, "%c %d %d", c->my_side, x, y);
     message_standart(&to_send, 402, 1, TURN, data);
     zmq_msg_send(&to_send, p->TO_ROUTER, 0);
     zmq_msg_close(&to_send);
@@ -169,13 +169,26 @@ int core_turn(core* c, int pos, parts* p, char who) {
 
 void interface_initialise(parts* to_init, core* c, player_info* info) {
     to_init->INTEFACE_CONTEXT = zmq_ctx_new();
+    assert(to_init->INTEFACE_CONTEXT != NULL);
+
     to_init->TO_ROUTER = zmq_socket(to_init->INTEFACE_CONTEXT, ZMQ_PUB);
-    int control = zmq_connect(to_init->TO_ROUTER, "ipc://@client/to_send");
+    assert(to_init->TO_ROUTER != NULL);
+
+    char router_name[BUF_SIZE];
+    sprintf(router_name, "ipc://@%s/to_send", info->client_type);
+    char tasks_sock_name[BUF_SIZE];
+    sprintf(tasks_sock_name, "ipc://@%s/main_loop_tasks", info->client_type);
+
+
+    int control = zmq_connect(to_init->TO_ROUTER, router_name);
     assert(control == 0);
+
     to_init->TASKS = zmq_socket(to_init->INTEFACE_CONTEXT, ZMQ_SUB);
-    control = zmq_connect(to_init->TASKS, "ipc://@client/main_loop_tasks");
+    control = zmq_connect(to_init->TASKS, tasks_sock_name);
     assert(control == 0);
+
     initialise_core(c, info);
+
     curs_set(0);
     initscr();
     noecho();
@@ -195,6 +208,8 @@ void parse(message* m, core* c, parts* p) {
         char ch;
         int x, y;
         sscanf(m->data, "%c%d%d", &ch, &x, &y);
+        printf("Inteface %s\n", m->data);
+
         core_turn(c, x * 3 + y, p, ch);
     }
     else if (m->type == OPPONENT_WIN) {

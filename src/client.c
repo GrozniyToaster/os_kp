@@ -1,13 +1,6 @@
-#include <assert.h>
-#include <ncurses.h>
-#include <pthread.h>
-#include <stdio.h>
-#include <string.h>
-#include <unistd.h>
-#include <zmq.h>
+
 
 #include "game.h"
-#include "structs.h"
 
 typedef struct {
     void* CONTEXT;
@@ -15,7 +8,7 @@ typedef struct {
     void* tasks;
     void* to_send;
 } ports;
-
+/*
 void ports_init(ports* p, player_info* pl_info) {
     int control;
     p->CONTEXT = zmq_ctx_new();
@@ -81,6 +74,7 @@ void router_module(void* information) {
     zmq_ctx_destroy(my_ports.CONTEXT);
 }
 
+*/
 int main() {
     pthread_t server_connect, interface_thread, chat_thread;
     pthread_attr_t attr;
@@ -90,7 +84,7 @@ int main() {
     player_info_initialise(&client_info, 'x', "client");
     pthread_create(&server_connect, &attr, (void*)router_module, &client_info);
 
-    interface(&client_info);
+    //interface(&client_info);
 
     pthread_join(server_connect, NULL);
 }

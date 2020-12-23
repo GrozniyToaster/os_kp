@@ -1,1 +1,0 @@
-char TEMP_DIR[] = "/tmp/lab678.XXXXXX";
