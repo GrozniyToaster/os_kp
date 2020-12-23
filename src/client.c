@@ -4,8 +4,9 @@
 #include <string.h>
 #include <assert.h>
 #include <unistd.h>
+#include <ncurses.h>
 
-
+#include "game.h"
 #include "structs.h"
 
 typedef struct MD
@@ -22,7 +23,7 @@ typedef struct {
 
 void client_send_module(void* information) {
     void* context = zmq_ctx_new();
-    printf("Client Listing Starting...\n");
+    //printf("Client Listing Starting...\n");
     void* to_server = zmq_socket(context, ZMQ_REQ);
     zmq_connect(to_server, "tcp://localhost:4040");
 
@@ -39,7 +40,6 @@ void client_send_module(void* information) {
             memcpy(&kek, zmq_msg_data(&task), sizeof(message));
             printf("Сервер прислал %s\n", kek.data);
             zmq_msg_close(&task);
-            //TODO parse
             //TODO copy and send
         }
         zmq_msg_init_size(&task, sizeof(message));
@@ -55,44 +55,16 @@ void client_send_module(void* information) {
     zmq_ctx_destroy(context);
 }
 
-int interface() {
-    void* context = zmq_ctx_new();
-    void* to_send = zmq_socket(context, ZMQ_PUB);
-    zmq_connect(to_send, "ipc://@client/to_send");
-    while (1) {
-        zmq_msg_t kek;
-        char text[] = "Interface";
-        message_standart(&kek, 42, 42, CHAT, text);
-        zmq_msg_send(&kek, to_send, 0);
-        sleep(2);
-    }
-
-}
-
-int chat() {
-    void* context = zmq_ctx_new();
-    void* to_send = zmq_socket(context, ZMQ_PUB);
-    int rc = zmq_connect(to_send, "ipc://@client/to_send");
-    assert(rc == 0);
-    while (1) {
-        zmq_msg_t kek;
-        char text[] = "chat";
-        //printf("Client chat\n");
-        message_standart(&kek, 42, 42, CHAT, text);
-        zmq_msg_send(&kek, to_send, 0);
-        sleep(3);
-    }
-
-}
-
-
 int main() {
     pthread_t server_connect, interface_thread, chat_thread;
     thread_info serv_info, client_info;
     pthread_attr_t attr;
     pthread_attr_init(&attr);
     pthread_create(&server_connect, &attr, (void*)client_send_module, &client_info);
-    pthread_create(&interface_thread, &attr, (void*)interface, &client_info);
-    pthread_create(&chat_thread, &attr, (void*)chat, &client_info);
+    player_info kek;
+    kek.is_my_turn = true;
+    kek.my_figure = 'x';
+    interface(&kek);
+
     pthread_join(server_connect, NULL);
 }
