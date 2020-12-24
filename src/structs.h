@@ -1,8 +1,9 @@
 #pragma once
 
+#include <stdbool.h>
+#include <assert.h>
 #include <string.h> 
 #include <zmq.h>
-#include <stdbool.h>
 
 #define BUF_SIZE 256
 #define MAIN_MODULE -1
@@ -24,18 +25,8 @@ typedef enum {
     QUIT
 } Command;
 
-typedef enum {
-    MAIN,
-    CALCULATOR
-} type_of_node;
 
 
-typedef struct {
-    char board[3][3];
-    char my_side;
-    bool is_my_turn;
-    bool win;
-} core;
 
 typedef struct {
     Command type;
@@ -47,6 +38,12 @@ typedef struct {
     int messageID;
 } message;
 
+typedef struct {
+    char board[3][3];
+    char my_side;
+    bool is_my_turn;
+    bool win;
+} core;
 
 typedef struct {
     bool is_my_turn;
@@ -54,10 +51,18 @@ typedef struct {
     char client_type[20];
 } player_info;
 
-void player_info_initialise(player_info* pl, char figure, const char* type);
+typedef struct {
+    void* CONTEXT;
+    void* opponent;
+    void* tasks;
+    void* to_send;
+} ports;
+
 
 void zmq_message_init(zmq_msg_t* mes, int sender, int recipient, int lastowner, Command command,const char* data, int moreData, int messageID);
-
 void message_init(message* mes, int sender, int recipient, int lastowner, Command command,const char* data, int moreData, int messageID);
-
 void message_standart(zmq_msg_t* mes, int sender, int recipient, Command command,const char* data);
+
+void player_info_initialise(player_info* pl, char figure, const char* type);
+
+void ports_init(ports* p, player_info* pl_info);

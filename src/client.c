@@ -1,14 +1,8 @@
 #include "game.h"
 
-typedef struct {
-    void* CONTEXT;
-    void* opponent;
-    void* tasks;
-    void* to_send;
-} ports;
 
 
-int main() {
+void client() {
     pthread_t server_connect, interface_thread, chat_thread;
     pthread_attr_t attr;
     pthread_attr_init(&attr);

@@ -1,7 +1,7 @@
 #include "game.h"
 
 
-int main() {
+void server() {
 	pthread_t server_connect, interface_thread, chat_thread;
 	pthread_attr_t attr;
 	pthread_attr_init(&attr);

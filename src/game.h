@@ -34,9 +34,30 @@ typedef struct {
     char chat_buf[CHAT_HEIGHT][BUF_SIZE];
 } parts;
 
+
+void client();
+
+void server();
+
 void interface(void* information);
 
 void router_module(void* information);
 
+// game core 
+void initialise_core(core* c, player_info* info);
+int core_turn(core* c, int pos, parts* p, char who);
+
+
+// inteface utils
+int kbhit(void);
+void system_message( parts*p , const char* mes );
+void send_chat_message( parts* p, const char* buf );
+void send_win(parts* p);
+void send_move(int x, int y, parts* p, core* c);
 void chat_push( parts* p, const char* mes );
 
+void draw(WINDOW* w, char  what);
+void draw_square(int sq, char what, parts* where);
+void highlight_square(int sq, parts* where);
+
+void create_board(parts* part);
