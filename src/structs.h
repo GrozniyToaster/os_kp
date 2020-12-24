@@ -12,6 +12,8 @@
 
 #define MORE_DATA 1
 
+#define PORT 4040
+
 typedef enum {
     REPLY,
     RECONNECT,
@@ -49,6 +51,7 @@ typedef struct {
     bool is_my_turn;
     char my_figure;
     char client_type[20];
+    char address[20];
 } player_info;
 
 typedef struct {
@@ -63,6 +66,6 @@ void zmq_message_init(zmq_msg_t* mes, int sender, int recipient, int lastowner, 
 void message_init(message* mes, int sender, int recipient, int lastowner, Command command,const char* data, int moreData, int messageID);
 void message_standart(zmq_msg_t* mes, int sender, int recipient, Command command,const char* data);
 
-void player_info_initialise(player_info* pl, char figure, const char* type);
+void player_info_initialise(player_info* pl, char figure, const char* type, const char* address);
 
 void ports_init(ports* p, player_info* pl_info);

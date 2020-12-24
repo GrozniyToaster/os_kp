@@ -101,6 +101,18 @@ void chat_enable( parts* p  ){
     p->chat_is_enabled = false;
 }
 
+void first_message( parts* p, player_info* info ){
+    char fm[BUF_SIZE];
+    sprintf( fm , "you figure is %c", info->my_figure );
+    system_message( p, fm );
+    if ( info->is_my_turn ){
+        sprintf( fm, "now your turn"  );
+    }else {
+        sprintf( fm, "now opponents turn" );
+    }
+    system_message(p, fm);
+}
+
 void interface(void* information) {
     player_info* info = information;
     parts this_interface;
@@ -110,6 +122,7 @@ void interface(void* information) {
     int sq = 0;
     
     highlight_square(sq, &this_interface);
+    first_message( &this_interface, info );
     do {
         check_task(&my_core, &this_interface);
         if (!kbhit()) {
@@ -135,6 +148,8 @@ void interface(void* information) {
                     if (my_core.win) {
                         system_message( &this_interface, "Are u wining son?" );
                     }
+            }else{
+                system_message( &this_interface,"you cant set figure there");
             }
         }else if (key == '-' && sq > 0) {
             draw_square(sq, 0, &this_interface);

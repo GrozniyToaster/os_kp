@@ -29,10 +29,11 @@ void message_standart(zmq_msg_t* mes, int sender, int recipient, Command command
 }
 
 
-void player_info_initialise(player_info* pl, char figure, const char* type) {
+void player_info_initialise(player_info* pl, char figure, const char* type, const char* address) {
     pl->is_my_turn = (figure == 'x');
     pl->my_figure = figure;
     strcpy(pl->client_type, type);
+    strcpy(pl->address, address);
 }
 
 
@@ -40,16 +41,18 @@ void ports_init(ports* p, player_info* pl_info) {
     int control;
     p->CONTEXT = zmq_ctx_new();
     assert(p->CONTEXT != NULL);
-
+    char address[50];
+    sprintf( address, "tcp://%s:%d", pl_info->address, PORT );
+    
     if (strcmp(pl_info->client_type, "server") == 0) {
         p->opponent = zmq_socket(p->CONTEXT, ZMQ_PAIR);
         assert(p->opponent != NULL);
-        control = zmq_bind(p->opponent, "tcp://*:4040");
+        control = zmq_bind(p->opponent, address );
     }
     else {
         p->opponent = zmq_socket(p->CONTEXT, ZMQ_PAIR);
         assert(p->opponent != NULL);
-        control = zmq_connect(p->opponent, "tcp://localhost:4040");
+        control = zmq_connect(p->opponent, address );
     }
     assert(control == 0);
 
