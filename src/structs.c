@@ -34,6 +34,7 @@ void player_info_initialise(player_info* pl, char figure, const char* type, cons
     pl->my_figure = figure;
     strcpy(pl->client_type, type);
     strcpy(pl->address, address);
+    get_hostinfo( pl );
 }
 
 
@@ -55,7 +56,10 @@ void ports_init(ports* p, player_info* pl_info) {
         control = zmq_connect(p->opponent, address );
     }
     assert(control == 0);
-
+    const int Wait_time =  1000;
+    zmq_setsockopt( p->opponent, ZMQ_RCVTIMEO, &Wait_time , sizeof(int)  );
+    zmq_setsockopt( p->opponent, ZMQ_SNDTIMEO, &Wait_time , sizeof(int)  );
+    
     char my_task_socket_name[BUF_SIZE];
     sprintf(my_task_socket_name, "ipc://@%s/main_loop_tasks", pl_info->client_type);
     p->tasks = zmq_socket(p->CONTEXT, ZMQ_PUB);
@@ -71,3 +75,17 @@ void ports_init(ports* p, player_info* pl_info) {
     assert(control == 0);
     zmq_setsockopt(p->to_send, ZMQ_SUBSCRIBE, 0, 0);
 }
+
+int get_hostinfo( player_info* pl_info ) {
+    char host_buf[BUF_SIZE]; 
+    char *ip_buf; 
+    struct hostent *host_entry; 
+
+    assert( (gethostname(host_buf, sizeof(host_buf)) != -1) ); 
+    host_entry = gethostbyname(host_buf); 
+    assert(host_entry != NULL);
+
+    ip_buf = inet_ntoa(*((struct in_addr*)host_entry->h_addr_list[0])); 
+    sprintf( pl_info->info, "%s %s", host_buf, ip_buf  );
+}
+

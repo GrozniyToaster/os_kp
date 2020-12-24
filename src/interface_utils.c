@@ -46,6 +46,11 @@ void chat_push( parts* p, const char* mes ){
     wrefresh( p->BOARD[9] );
 } 
 
+void chat_connected( parts* p, const char* m ){
+    char buf[BUF_SIZE];
+    sprintf( buf, "Connected %s", m );
+    chat_push( p, buf );
+}
 
 void send_win(parts* p) {
     zmq_msg_t to_send;

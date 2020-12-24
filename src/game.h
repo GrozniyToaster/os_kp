@@ -55,6 +55,7 @@ void send_chat_message( parts* p, const char* buf );
 void send_win(parts* p);
 void send_move(int x, int y, parts* p, core* c);
 void chat_push( parts* p, const char* mes );
+void chat_connected( parts* p, const char* m );
 
 void draw(WINDOW* w, char  what);
 void draw_square(int sq, char what, parts* where);

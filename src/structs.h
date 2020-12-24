@@ -5,6 +5,11 @@
 #include <string.h> 
 #include <zmq.h>
 
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <netdb.h>
+
 #define BUF_SIZE 256
 #define MAIN_MODULE -1
 #define TO_ALL -42
@@ -16,7 +21,7 @@
 
 typedef enum {
     REPLY,
-    RECONNECT,
+    CONNECT,
     CHAT,
     ANSWER,
     PING,
@@ -52,6 +57,7 @@ typedef struct {
     char my_figure;
     char client_type[20];
     char address[20];
+    char info[256];
 } player_info;
 
 typedef struct {
@@ -69,3 +75,4 @@ void message_standart(zmq_msg_t* mes, int sender, int recipient, Command command
 void player_info_initialise(player_info* pl, char figure, const char* type, const char* address);
 
 void ports_init(ports* p, player_info* pl_info);
+int get_hostinfo( player_info* pl_info );

@@ -8,21 +8,27 @@ void router_deinit( ports* to_deinit ){
 }
 
 
+void send_first_information( ports* p, player_info* info ){
+    if ( strcmp(info ->client_type, "server") == 0  ){
+        return;
+    }
+    zmq_msg_t to_send;
+    message_standart( &to_send, 42, 42, CONNECT, info->info );
+    zmq_msg_send( &to_send, p->opponent, 0 );
+}
+
+
 void router_module(void* information) {
     ports my_ports;
-    ports_init(&my_ports, information);
+    player_info* info = (player_info*)information; 
+    ports_init(&my_ports, info);
+    send_first_information( &my_ports, info );
 
     while (true) {
         zmq_msg_t task;
         zmq_msg_init_size(&task, sizeof(message));
         int sizeof_message = zmq_msg_recv(&task, my_ports.opponent, ZMQ_DONTWAIT);
         if (sizeof_message > 0) {
-            message kek;
-            zmq_msg_t try;
-            zmq_msg_init_size(&try, sizeof(message));
-            //printf("Router recv opponent\n");
-            memcpy((&try), zmq_msg_data(&task), sizeof(message));
-            //printf("Router %s\n", kek.data);
             zmq_msg_send(&task, my_ports.tasks, 0);
             zmq_msg_close(&task);
             sleep(1);
@@ -31,16 +37,15 @@ void router_module(void* information) {
             zmq_msg_init(&ans);
             zmq_msg_send(&ans, my_ports.opponent, 0);
             zmq_msg_close(&ans);
-
         }
         zmq_msg_init_size(&task, sizeof(message));
         sizeof_message = zmq_msg_recv(&task, my_ports.to_send, ZMQ_DONTWAIT);
         if (sizeof_message > 0) {
-            //printf("Router recv task own\n");
-            zmq_msg_send(&task, my_ports.opponent, 0);
             if ( ((message*)zmq_msg_data(&task)) -> type == QUIT ){
-                printf("exit");
+                zmq_msg_send(&task, my_ports.opponent, 0);
                 break;
+            }else{
+                zmq_msg_send(&task, my_ports.opponent, 0);
             }
             zmq_msg_close(&task);
             zmq_msg_t ans;
@@ -49,7 +54,6 @@ void router_module(void* information) {
             zmq_msg_recv(&ans, my_ports.opponent, 0);
             zmq_msg_close(&ans);
         }
-        //printf("loop\n");
         sleep(1);
 
     }

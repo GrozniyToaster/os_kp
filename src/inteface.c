@@ -41,6 +41,7 @@ void interface_initialise(parts* to_init, core* c, player_info* info) {
     for ( int  i = 0 ; i < CHAT_HEIGHT; i++  ){
         to_init->chat_buf[i][0] = '\0';
     }
+    mvprintw( LINES - 1, 0, info->info );
 }
 
 void deinitialize( parts* to_deinit ){
@@ -69,6 +70,8 @@ void parse(message* m, core* c, parts* p) {
         chat_push( p, formatted );
     } else if ( m->type == QUIT ){
         system_message( p, "opponent exited from game" );
+    } else if ( m->type == CONNECT ){
+        chat_connected( p, m->data );
     }
 
 }
