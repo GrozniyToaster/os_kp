@@ -1,6 +1,6 @@
 #include "structs.h"
 
-void zmq_message_init(zmq_msg_t* mes, int sender, int recipient, int lastowner, Command command, char* data, int moreData, int messageID) {
+void zmq_message_init(zmq_msg_t* mes, int sender, int recipient, int lastowner, Command command,const char* data, int moreData, int messageID) {
     zmq_msg_init_size(mes, sizeof(message));
     message tmp;
     tmp.sender = sender;
@@ -13,7 +13,7 @@ void zmq_message_init(zmq_msg_t* mes, int sender, int recipient, int lastowner, 
     memcpy(zmq_msg_data(mes), &tmp, sizeof(message));
 }
 
-void message_init(message* mes, int sender, int recipient, int lastowner, Command command, char* data, int moreData, int messageID) {
+void message_init(message* mes, int sender, int recipient, int lastowner, Command command,const char* data, int moreData, int messageID) {
 
     mes->sender = sender;
     mes->recipient = recipient;
@@ -24,7 +24,7 @@ void message_init(message* mes, int sender, int recipient, int lastowner, Comman
     strcpy(mes->data, data);
 }
 
-void message_standart(zmq_msg_t* mes, int sender, int recipient, Command command, char* data) {
+void message_standart(zmq_msg_t* mes, int sender, int recipient, Command command,const char* data) {
     zmq_message_init(mes, sender, recipient, sender, command, data, 0, 0);
 }
 

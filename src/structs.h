@@ -20,7 +20,8 @@ typedef enum {
     DATA,
     TURN,
     ERROR,
-    OPPONENT_WIN
+    OPPONENT_WIN,
+    QUIT
 } Command;
 
 typedef enum {
@@ -28,13 +29,6 @@ typedef enum {
     CALCULATOR
 } type_of_node;
 
-typedef struct {
-    type_of_node type;
-    int MY_ID;
-    void* CONTEXT;
-    char SSN[BUF_SIZE]; //INPUT_SOCKET_NAME
-    void* SS; //SEND_SOCKET
-} IDCard;
 
 typedef struct {
     char board[3][3];
@@ -62,8 +56,8 @@ typedef struct {
 
 void player_info_initialise(player_info* pl, char figure, const char* type);
 
-void zmq_message_init(zmq_msg_t* mes, int sender, int recipient, int lastowner, Command command, char* data, int moreData, int messageID);
+void zmq_message_init(zmq_msg_t* mes, int sender, int recipient, int lastowner, Command command,const char* data, int moreData, int messageID);
 
-void message_init(message* mes, int sender, int recipient, int lastowner, Command command, char* data, int moreData, int messageID);
+void message_init(message* mes, int sender, int recipient, int lastowner, Command command,const char* data, int moreData, int messageID);
 
-void message_standart(zmq_msg_t* mes, int sender, int recipient, Command command, char* data);
+void message_standart(zmq_msg_t* mes, int sender, int recipient, Command command,const char* data);

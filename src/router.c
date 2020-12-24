@@ -72,13 +72,16 @@ void router_module(void* information) {
             zmq_msg_send(&ans, my_ports.opponent, 0);
             zmq_msg_close(&ans);
 
-            //TODO copy and send
         }
         zmq_msg_init_size(&task, sizeof(message));
         sizeof_message = zmq_msg_recv(&task, my_ports.to_send, ZMQ_DONTWAIT);
         if (sizeof_message > 0) {
             //printf("Router recv task own\n");
             zmq_msg_send(&task, my_ports.opponent, 0);
+            if ( ((message*)zmq_msg_data(&task)) -> type == QUIT ){
+                printf("exit");
+                break;
+            }
             zmq_msg_close(&task);
             zmq_msg_t ans;
             sleep(1);
@@ -92,5 +95,6 @@ void router_module(void* information) {
     }
     zmq_close(my_ports.opponent);
     zmq_close(my_ports.to_send);
+    zmq_close( my_ports.tasks );
     zmq_ctx_destroy(my_ports.CONTEXT);
 }
