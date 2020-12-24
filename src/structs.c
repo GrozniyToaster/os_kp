@@ -76,7 +76,7 @@ void ports_init(ports* p, player_info* pl_info) {
     zmq_setsockopt(p->to_send, ZMQ_SUBSCRIBE, 0, 0);
 }
 
-int get_hostinfo( player_info* pl_info ) {
+void get_hostinfo( player_info* pl_info ) {
     char host_buf[BUF_SIZE]; 
     char *ip_buf; 
     struct hostent *host_entry; 

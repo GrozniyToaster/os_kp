@@ -75,4 +75,4 @@ void message_standart(zmq_msg_t* mes, int sender, int recipient, Command command
 void player_info_initialise(player_info* pl, char figure, const char* type, const char* address);
 
 void ports_init(ports* p, player_info* pl_info);
-int get_hostinfo( player_info* pl_info );
+void get_hostinfo( player_info* pl_info );

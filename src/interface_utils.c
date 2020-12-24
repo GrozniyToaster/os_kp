@@ -76,7 +76,7 @@ void draw(WINDOW* w, char  what) {
             mvwaddch(w, y, xj, '#' | A_BOLD);
         }
     }
-    else if (what == 'o' | what == '0') {
+    else if (what == 'o' || what == '0') {
         for (int i = 0; i < 3; i++) {
             mvwaddch(w, 2 + i, 1, '#' | A_BOLD);
             mvwaddch(w, 2 + i, SQ_WIDTH - 2, '#' | A_BOLD);
