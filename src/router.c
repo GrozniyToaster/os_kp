@@ -10,6 +10,13 @@ void router_deinit( ports* to_deinit ){
 
 void send_first_information( ports* p, player_info* info ){
     if ( strcmp(info ->client_type, "server") == 0  ){
+        char st[BUF_SIZE];
+        read_stats_str(st);
+        zmq_msg_t to_answer;
+
+
+        message_standart(&to_answer, FIRST_WATCHED, ANONIMUS, CONNECT,st );
+        zmq_msg_send( &to_answer, p->opponent, 0 );
         return;
     }
     zmq_msg_t to_send;

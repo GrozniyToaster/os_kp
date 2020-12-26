@@ -2,7 +2,7 @@
 
 /**
  * @brief check is keyboard hit (key was pressed )
- * 
+ *
  * @return int (true or false)
  */
 int kbhit(void) {
@@ -11,8 +11,7 @@ int kbhit(void) {
     ch = getch();
     if (ch == ERR) {
         r = false;
-    }
-    else {
+    } else {
         r = true;
         ungetch(ch);
     }
@@ -20,36 +19,53 @@ int kbhit(void) {
     return r;
 }
 
-void system_message( parts*p , const char* mes ){
+void system_message(parts* p, const char* mes) {
     char formatted[256];
     sprintf(formatted, "GameMaster: %s", mes);
-    chat_push( p, formatted );
+    chat_push(p, formatted);
 }
 
 
-void send_chat_message( parts* p, const char* buf ){
+void send_chat_message(parts* p, const char* buf) {
     zmq_msg_t to_send;
-    message_standart( &to_send, FIRST_WATCHED, ANONIMUS, CHAT,buf );
-    zmq_msg_send( &to_send, p->TO_ROUTER, 0 );
+    message_standart(&to_send, FIRST_WATCHED, ANONIMUS, CHAT, buf);
+    zmq_msg_send(&to_send, p->TO_ROUTER, 0);
 }
 
-void chat_push( parts* p, const char* mes ){
-    wclear( p->BOARD[9] );
-    highlight_square( 9, p );
-    for ( int i = CHAT_HEIGHT -1; i > 0; i-- ){
-        strcpy( p->chat_buf[i], p->chat_buf[i-1] );
+void chat_push(parts* p, const char* mes) {
+    wclear(p->BOARD[9]);
+    highlight_square(9, p);
+    for (int i = CHAT_HEIGHT - 1; i > 0; i--) {
+        strcpy(p->chat_buf[i], p->chat_buf[i - 1]);
     }
-    strcpy( p->chat_buf[0], mes );
-    for ( int i =  CHAT_HEIGHT, chat_str = 0  ; i > 0; i--, chat_str++ ){
-        mvwprintw( p->BOARD[9], i, 1,  "%s", p->chat_buf[chat_str], chat_str, i );
+    strcpy(p->chat_buf[0], mes);
+    for (int i = CHAT_HEIGHT, chat_str = 0; i > 0; i--, chat_str++) {
+        mvwprintw(p->BOARD[9], i, 1, "%s", p->chat_buf[chat_str], chat_str, i);
     }
-    wrefresh( p->BOARD[9] );
-} 
+    wrefresh(p->BOARD[9]);
+}
 
-void chat_connected( parts* p, const char* m ){
+void read_stats(my_stat* to_read) {
+    FILE* read_stat = fopen("/tmp/xo_stat/stat.bin", "rb");
+    if (read_stat == NULL) { return; }
+    fread(to_read, sizeof(my_stat), 1, read_stat);
+    fclose(read_stat);
+
+}
+
+void read_stats_str(char* buf) {
+    my_stat st;
+    read_stats(&st);
+    sprintf(buf, "Win X %d; Win O %d; Loses X %d; Loses X %d;", st.win_x, st.win_o, st.lose_x, st.lose_o );
+}
+
+void chat_connected(parts* p, const char* m) {
     char buf[BUF_SIZE];
-    sprintf( buf, "Connected %s", m );
-    chat_push( p, buf );
+    sprintf(buf, "Connected %s", m);
+    chat_push(p, buf);
+
+    
+
 }
 
 void send_win(parts* p) {
@@ -66,7 +82,6 @@ void send_move(int x, int y, parts* p, core* c) {
     message_standart(&to_send, FIRST_WATCHED, ANONIMUS, TURN, data);
     zmq_msg_send(&to_send, p->TO_ROUTER, 0);
     zmq_msg_close(&to_send);
-
 }
 
 void draw(WINDOW* w, char  what) {
@@ -75,8 +90,7 @@ void draw(WINDOW* w, char  what) {
             mvwaddch(w, y, xi, '#' | A_BOLD);
             mvwaddch(w, y, xj, '#' | A_BOLD);
         }
-    }
-    else if (what == 'o' || what == '0') {
+    } else if (what == 'o' || what == '0') {
         for (int i = 0; i < 3; i++) {
             mvwaddch(w, 2 + i, 1, '#' | A_BOLD);
             mvwaddch(w, 2 + i, SQ_WIDTH - 2, '#' | A_BOLD);
@@ -85,8 +99,7 @@ void draw(WINDOW* w, char  what) {
             mvwaddch(w, 1, 2 + i, '#' | A_BOLD);
             mvwaddch(w, SQ_HEIGHT - 2, 2 + i, '#' | A_BOLD);
         }
-    }
-    else {
+    } else {
         return;
     }
     wrefresh(w);

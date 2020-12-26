@@ -14,6 +14,11 @@
 #define MAIN_MODULE -1
 #define TO_ALL -42
 #define FIRST_WATCHED -87
+#define ANONIMUS -1
+
+#define NOT_ENDED -18
+#define I_WIN 10
+#define I_LOSE 44
 
 #define MORE_DATA 1
 
@@ -55,6 +60,7 @@ typedef struct {
 typedef struct {
     bool is_my_turn;
     char my_figure;
+    int how_game_ended;
     char client_type[20];
     char address[20];
     char info[256];
@@ -68,11 +74,21 @@ typedef struct {
 } ports;
 
 
-void zmq_message_init(zmq_msg_t* mes, int sender, int recipient, int lastowner, Command command,const char* data, int moreData, int messageID);
-void message_init(message* mes, int sender, int recipient, int lastowner, Command command,const char* data, int moreData, int messageID);
-void message_standart(zmq_msg_t* mes, int sender, int recipient, Command command,const char* data);
+typedef struct {
+    int win_x;
+    int lose_x;
+    int win_o;
+    int lose_o;
+    int not_ended;
+} my_stat;
+
+void zmq_message_init(zmq_msg_t* mes, int sender, int recipient, int lastowner, Command command, const char* data, int moreData, int messageID);
+void message_init(message* mes, int sender, int recipient, int lastowner, Command command, const char* data, int moreData, int messageID);
+void message_standart(zmq_msg_t* mes, int sender, int recipient, Command command, const char* data);
 
 void player_info_initialise(player_info* pl, char figure, const char* type, const char* address);
 
 void ports_init(ports* p, player_info* pl_info);
-void get_hostinfo( player_info* pl_info );
+void get_hostinfo(player_info* pl_info);
+
+void my_stat_initialise(my_stat* st);
