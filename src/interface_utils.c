@@ -29,7 +29,7 @@ void system_message( parts*p , const char* mes ){
 
 void send_chat_message( parts* p, const char* buf ){
     zmq_msg_t to_send;
-    message_standart( &to_send, 40, 123, CHAT,buf );
+    message_standart( &to_send, FIRST_WATCHED, ANONIMUS, CHAT,buf );
     zmq_msg_send( &to_send, p->TO_ROUTER, 0 );
 }
 
@@ -54,7 +54,7 @@ void chat_connected( parts* p, const char* m ){
 
 void send_win(parts* p) {
     zmq_msg_t to_send;
-    message_standart(&to_send, 42, 1, OPPONENT_WIN, "opponent win");
+    message_standart(&to_send, FIRST_WATCHED, ANONIMUS, OPPONENT_WIN, "opponent win");
     zmq_msg_send(&to_send, p->TO_ROUTER, 0);
     zmq_msg_close(&to_send);
 }
@@ -63,7 +63,7 @@ void send_move(int x, int y, parts* p, core* c) {
     zmq_msg_t to_send;
     char data[256];
     sprintf(data, "%c %d %d", c->my_side, x, y);
-    message_standart(&to_send, 402, 1, TURN, data);
+    message_standart(&to_send, FIRST_WATCHED, ANONIMUS, TURN, data);
     zmq_msg_send(&to_send, p->TO_ROUTER, 0);
     zmq_msg_close(&to_send);
 

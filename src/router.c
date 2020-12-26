@@ -13,7 +13,7 @@ void send_first_information( ports* p, player_info* info ){
         return;
     }
     zmq_msg_t to_send;
-    message_standart( &to_send, 42, 42, CONNECT, info->info );
+    message_standart( &to_send, FIRST_WATCHED, ANONIMUS, CONNECT, info->info );
     zmq_msg_send( &to_send, p->opponent, 0 );
 }
 

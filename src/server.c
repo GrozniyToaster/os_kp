@@ -1,6 +1,7 @@
 #include "game.h"
 
 
+
 void server(const char* address) {
 	pthread_t server_connect;
 	pthread_attr_t attr;

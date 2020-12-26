@@ -18,6 +18,9 @@
 #define SQ_WIDTH 9
 #define BOARD_SIZE 9
 
+#define FIRST_WATCHED -42
+#define ANONIMUS -1
+
 #define CHAT_HEIGHT SQ_HEIGHT * 3 - 3
 
 #define NO_WIN 2

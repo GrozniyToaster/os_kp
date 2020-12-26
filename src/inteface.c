@@ -46,7 +46,7 @@ void interface_initialise(parts* to_init, core* c, player_info* info) {
 
 void deinitialize( parts* to_deinit ){
     zmq_msg_t to_exit;
-    message_standart( &to_exit, -1, -1, QUIT, "" );
+    message_standart( &to_exit, FIRST_WATCHED, ANONIMUS, QUIT, "" );
     zmq_msg_send(&to_exit, to_deinit->TO_ROUTER, 0);
     
     zmq_close(to_deinit->TO_ROUTER);
