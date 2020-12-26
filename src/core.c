@@ -6,6 +6,7 @@ void initialise_core(core* c, player_info* info) {
     c->win = false;
     c->is_my_turn = info->is_my_turn;
     c->my_side = info->my_figure;
+    c->size = info->size; // TODO info->size
     for (int i = 0; i < BOARD_SIZE / 3; i++) {
         for (int j = 0; j < BOARD_SIZE / 3; j++) {
             c->board[i][j] = ' ';
@@ -13,7 +14,49 @@ void initialise_core(core* c, player_info* info) {
     }
 }
 
+
+bool check_case(core* c, int pos_x, int pos_y, int dx, int dy) {
+    int count_right = 0;
+    int curpos_x = pos_x, curpos_y = pos_y;
+    while (curpos_x >= 0 && curpos_y >= 0) {
+        if (c->board[curpos_x][curpos_y] == c->my_side) {
+            count_right++;
+        } else {
+            return false;
+        }
+        curpos_x += dx;
+        curpos_y += dy;
+    }
+    curpos_x = pos_x - dx; curpos_y = pos_y - dy;
+    while (curpos_x < c->size && curpos_y < c->size) {
+        if (c->board[curpos_x][curpos_y] == c->my_side) {
+            count_right++;
+        } else {
+            return false;
+        }
+        curpos_x -= dx;
+        curpos_y -= dy;
+    }
+    return count_right == c->size;
+}
+
+
 bool  check_board(core* c, int x, int y) {
+    if (check_case(c, x, y, -1, 0)){
+        return true;
+    }
+    if (check_case(c, x, y, -1, -1)){
+        return true;
+    }
+    if (check_case(c, x, y, 0, -1)){
+        return true;
+    }
+    if (check_case(c, x, y, 1, -1)){
+        return true;
+    }
+    return false;
+
+    /*
     // check horizontal
     for (int i = 0; i < 3; i++) {
         if (c->board[i][0] == c->board[i][1] &&
@@ -46,6 +89,7 @@ bool  check_board(core* c, int x, int y) {
         return true;
     }
     return false;
+    */
 }
 
 
@@ -56,7 +100,7 @@ int core_turn(core* c, int pos, parts* p, char who) {
         return CANT_SET;
     }
     c->board[x][y] = who;
-    draw_square(pos, who, p);
+    draw_square(p->BOARD[pos], who, p);
     c->win = check_board(c, x, y);
     if (c->win) {
         send_move(x, y, p, c);
@@ -66,8 +110,7 @@ int core_turn(core* c, int pos, parts* p, char who) {
     if (who == c->my_side) {
         send_move(x, y, p, c);
         c->is_my_turn = false;
-    }
-    else {
+    } else {
         c->is_my_turn = true;
     }
     return NO_WIN;

@@ -17,14 +17,15 @@
 
 #include "structs.h"
 
-#define SQ_HEIGHT 7
-#define SQ_WIDTH 9
+#define SQ_HEIGHT 3
+#define SQ_WIDTH  3
+
 #define BOARD_SIZE 9
 
 
 
 
-#define CHAT_HEIGHT SQ_HEIGHT * 3 - 3
+#define CHAT_HEIGHT 27
 
 #define NO_WIN 2
 #define WIN 1
@@ -34,7 +35,8 @@
 
 
 typedef struct {
-    WINDOW* BOARD[10];
+    WINDOW** BOARD;
+    WINDOW* CHAT;
 
     void* INTEFACE_CONTEXT;
     void* TO_ROUTER;
@@ -44,9 +46,9 @@ typedef struct {
 } parts;
 
 
-void client();
+void client( int size, const char* addr );
 
-void server();
+void server(int size, const char* addr);
 
 void interface(void* information);
 
@@ -69,7 +71,7 @@ void read_stats( my_stat* to_read );
 void read_stats_str(char* buf);
 
 void draw(WINDOW* w, char  what);
-void draw_square(int sq, char what, parts* where);
-void highlight_square(int sq, parts* where);
+void draw_square(WINDOW* w, char what, parts* where);
+void highlight_square(WINDOW* w, parts* where);
 
-void create_board(parts* part);
+void create_board(parts* part, player_info* info);

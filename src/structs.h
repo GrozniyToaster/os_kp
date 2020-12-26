@@ -55,6 +55,7 @@ typedef struct {
     char my_side;
     bool is_my_turn;
     bool win;
+    int size;
 } core;
 
 typedef struct {
@@ -64,6 +65,7 @@ typedef struct {
     char client_type[20];
     char address[20];
     char info[256];
+    int size;
 } player_info;
 
 typedef struct {
@@ -86,7 +88,7 @@ void zmq_message_init(zmq_msg_t* mes, int sender, int recipient, int lastowner, 
 void message_init(message* mes, int sender, int recipient, int lastowner, Command command, const char* data, int moreData, int messageID);
 void message_standart(zmq_msg_t* mes, int sender, int recipient, Command command, const char* data);
 
-void player_info_initialise(player_info* pl, char figure, const char* type, const char* address);
+void player_info_initialise(player_info* pl, char figure, const char* type, const char* address, int size_of_board);
 
 void ports_init(ports* p, player_info* pl_info);
 void get_hostinfo(player_info* pl_info);

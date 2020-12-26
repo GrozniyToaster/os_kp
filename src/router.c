@@ -13,8 +13,6 @@ void send_first_information( ports* p, player_info* info ){
         char st[BUF_SIZE];
         read_stats_str(st);
         zmq_msg_t to_answer;
-
-
         message_standart(&to_answer, FIRST_WATCHED, ANONIMUS, CONNECT,st );
         zmq_msg_send( &to_answer, p->opponent, 0 );
         return;

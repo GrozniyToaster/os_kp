@@ -29,10 +29,11 @@ void message_standart(zmq_msg_t* mes, int sender, int recipient, Command command
 }
 
 
-void player_info_initialise(player_info* pl, char figure, const char* type, const char* address) {
+void player_info_initialise(player_info* pl, char figure, const char* type, const char* address, int size_of_board) {
     pl->is_my_turn = (figure == 'x');
     pl->my_figure = figure;
     pl->how_game_ended = NOT_ENDED;
+    pl->size = size_of_board;
     strcpy(pl->client_type, type);
     strcpy(pl->address, address);
     get_hostinfo(pl);

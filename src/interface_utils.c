@@ -33,16 +33,16 @@ void send_chat_message(parts* p, const char* buf) {
 }
 
 void chat_push(parts* p, const char* mes) {
-    wclear(p->BOARD[9]);
-    highlight_square(9, p);
+    wclear(p->CHAT);
+    highlight_square(p->CHAT, p);
     for (int i = CHAT_HEIGHT - 1; i > 0; i--) {
         strcpy(p->chat_buf[i], p->chat_buf[i - 1]);
     }
     strcpy(p->chat_buf[0], mes);
     for (int i = CHAT_HEIGHT, chat_str = 0; i > 0; i--, chat_str++) {
-        mvwprintw(p->BOARD[9], i, 1, "%s", p->chat_buf[chat_str], chat_str, i);
+        mvwprintw(p->CHAT, i, 1, "%s", p->chat_buf[chat_str], chat_str, i);
     }
-    wrefresh(p->BOARD[9]);
+    wrefresh(p->CHAT);
 }
 
 void read_stats(my_stat* to_read) {
@@ -85,6 +85,8 @@ void send_move(int x, int y, parts* p, core* c) {
 }
 
 void draw(WINDOW* w, char  what) {
+    mvwaddch(w, 1, 1, what | A_BOLD);
+    /*
     if (what == 'x') {
         for (int xi = 1, xj = SQ_HEIGHT, y = 0; y < SQ_HEIGHT; y++, xi++, xj--) {
             mvwaddch(w, y, xi, '#' | A_BOLD);
@@ -102,49 +104,57 @@ void draw(WINDOW* w, char  what) {
     } else {
         return;
     }
+    */
     wrefresh(w);
 }
 
-void draw_square(int sq, char what, parts* where) {
+void draw_square(WINDOW* w, char what, parts* where) {
     if (what != 0) {
-        draw(where->BOARD[sq], what);
+        draw(w, what);
     }
-    box(where->BOARD[sq], 0, 0);
-    wrefresh(where->BOARD[sq]);
+    box(w, 0, 0);
+    wrefresh(w);
 }
 
 
-void create_board(parts* part) {
-    int i;
+void create_board(parts* part, player_info* info) {
+    int size_of_boar = (info->size) * (info->size);
+    part->BOARD = malloc( size_of_boar * sizeof( WINDOW* ) );
+    
     int start_y, start_x;
 
     start_y = 0;
-    start_x = 0;
-    for (i = 0; i < 3; i++) {
-        part->BOARD[i] = newwin(SQ_HEIGHT, SQ_WIDTH, start_y, start_x);
-        start_x += SQ_WIDTH;
+    for ( int j = 0; j < info->size; j++ ){
+        start_x = 0;
+        for ( int i = 0; i < info->size; i++) {
+            part->BOARD[j * (info->size) + i] = newwin(SQ_HEIGHT, SQ_WIDTH, start_y, start_x);
+            start_x += SQ_WIDTH;
+        }
+        start_y += SQ_HEIGHT;
     }
-    start_y = SQ_HEIGHT;
-    start_x = 0;
-    for (i = 3; i < 6; i++) {
-        part->BOARD[i] = newwin(SQ_HEIGHT, SQ_WIDTH, start_y, start_x);
-        start_x += SQ_WIDTH;
+    // start_x = 0;
+    // for (i = 3; i < 6; i++) {
+    //     part->BOARD[i] = newwin(SQ_HEIGHT, SQ_WIDTH, start_y, start_x);
+    //     start_x += SQ_WIDTH;
+    // }
+    // start_x = 0;
+    // start_y = 2 * SQ_HEIGHT;
+    // for (i = 6; i < 9; i++) {
+    //     part->BOARD[i] = newwin(SQ_HEIGHT, SQ_WIDTH, start_y, start_x);
+    //     start_x += SQ_WIDTH;
+    // }
+    part->CHAT = newwin(30, 70, 0, (info->size) * SQ_WIDTH);
+    for (int i = 0; i < size_of_boar; i++) {
+        draw_square(part->BOARD[i], 0, part);
     }
-    start_x = 0;
-    start_y = 2 * SQ_HEIGHT;
-    for (i = 6; i < 9; i++) {
-        part->BOARD[i] = newwin(SQ_HEIGHT, SQ_WIDTH, start_y, start_x);
-        start_x += SQ_WIDTH;
-    }
-    part->BOARD[9] = newwin(SQ_HEIGHT * 3, 50, 0, 3 * SQ_WIDTH);
-    for (i = 0; i < 10; i++) {
-        draw_square(i, 0, part);
-    }
+    draw_square(part->CHAT, 0, part);
+
 }
 
 
-void highlight_square(int sq, parts* where) {
-    wattron(where->BOARD[sq], A_STANDOUT);
-    draw_square(sq, 0, where);
-    wattroff(where->BOARD[sq], A_STANDOUT);
+void highlight_square(WINDOW* w, parts* where) {
+    wattron(w, A_STANDOUT);
+    draw_square(w, 0, where);
+    wattroff(w, A_STANDOUT);
+
 }
