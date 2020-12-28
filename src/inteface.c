@@ -1,10 +1,8 @@
 #include "game.h"
 
 
-
-
-
 void interface_initialise(parts* to_init, core* c, player_info* info) {
+    //TODO message with size
     to_init->INTEFACE_CONTEXT = zmq_ctx_new();
     assert(to_init->INTEFACE_CONTEXT != NULL);
 
@@ -90,9 +88,8 @@ void write_stat(player_info* info) {
 
 }
 
-void deinitialize(parts* to_deinit, player_info* info) {
+void deinitialize(parts* to_deinit, player_info* info, core* c) {
     write_stat(info);
-
 
     zmq_msg_t to_exit;
     message_standart(&to_exit, FIRST_WATCHED, ANONIMUS, QUIT, "");
@@ -104,6 +101,7 @@ void deinitialize(parts* to_deinit, player_info* info) {
     zmq_ctx_destroy(to_deinit->INTEFACE_CONTEXT);
     endwin();
     free(to_deinit->BOARD);
+    deinitialise_core(c);
 
 }
 
@@ -112,7 +110,7 @@ void parse(message* m, core* c, parts* p, player_info* info) {
         char ch;
         int x, y;
         sscanf(m->data, "%c%d%d", &ch, &x, &y);
-        core_turn(c, x * 3 + y, p, ch);
+        core_turn(c, x * c->size + y, p, ch);
     } else if (m->type == OPPONENT_WIN) {
         info->how_game_ended = I_LOSE;
         system_message(p, "opponent win");
@@ -185,7 +183,7 @@ void interface(void* information) {
             continue;
         }
         key = getch();
-        if (key == '+' && sq < size_of_board) { // TODO sizability
+        if (key == '+' && sq < size_of_board) { 
             draw_square(this_interface.BOARD[sq], 0, &this_interface);
             ++sq;
             if (sq == size_of_board) {
@@ -213,14 +211,14 @@ void interface(void* information) {
                 system_message(&this_interface, "you cant set figure there");
             }
         } else if (key == '-' && sq > 0) {
-            if ( sq == size_of_board ){
+            if (sq == size_of_board) {
                 draw_square(this_interface.CHAT, 0, &this_interface);
-            }else{
+            } else {
                 draw_square(this_interface.BOARD[sq], 0, &this_interface);
             }
             --sq;
             highlight_square(this_interface.BOARD[sq], &this_interface);
         }
     } while ((key != 'q') && (key != 'Q'));
-    deinitialize(&this_interface, info);
+    deinitialize(&this_interface, info, &my_core);
 }

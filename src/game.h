@@ -57,6 +57,7 @@ void router_module(void* information);
 // game core 
 void initialise_core(core* c, player_info* info);
 int core_turn(core* c, int pos, parts* p, char who);
+void deinitialise_core( core* c );
 
 
 // inteface utils

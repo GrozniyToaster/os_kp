@@ -56,16 +56,13 @@ void read_stats(my_stat* to_read) {
 void read_stats_str(char* buf) {
     my_stat st;
     read_stats(&st);
-    sprintf(buf, "Win X %d; Win O %d; Loses X %d; Loses X %d;", st.win_x, st.win_o, st.lose_x, st.lose_o );
+    sprintf(buf, "Win X %d; Win O %d; Loses X %d; Loses X %d; Not ended %d", st.win_x, st.win_o, st.lose_x, st.lose_o, st.not_ended );
 }
 
 void chat_connected(parts* p, const char* m) {
     char buf[BUF_SIZE];
     sprintf(buf, "Connected %s", m);
     chat_push(p, buf);
-
-    
-
 }
 
 void send_win(parts* p) {
@@ -86,25 +83,6 @@ void send_move(int x, int y, parts* p, core* c) {
 
 void draw(WINDOW* w, char  what) {
     mvwaddch(w, 1, 1, what | A_BOLD);
-    /*
-    if (what == 'x') {
-        for (int xi = 1, xj = SQ_HEIGHT, y = 0; y < SQ_HEIGHT; y++, xi++, xj--) {
-            mvwaddch(w, y, xi, '#' | A_BOLD);
-            mvwaddch(w, y, xj, '#' | A_BOLD);
-        }
-    } else if (what == 'o' || what == '0') {
-        for (int i = 0; i < 3; i++) {
-            mvwaddch(w, 2 + i, 1, '#' | A_BOLD);
-            mvwaddch(w, 2 + i, SQ_WIDTH - 2, '#' | A_BOLD);
-        }
-        for (int i = 0; i < 5; i++) {
-            mvwaddch(w, 1, 2 + i, '#' | A_BOLD);
-            mvwaddch(w, SQ_HEIGHT - 2, 2 + i, '#' | A_BOLD);
-        }
-    } else {
-        return;
-    }
-    */
     wrefresh(w);
 }
 
@@ -132,17 +110,6 @@ void create_board(parts* part, player_info* info) {
         }
         start_y += SQ_HEIGHT;
     }
-    // start_x = 0;
-    // for (i = 3; i < 6; i++) {
-    //     part->BOARD[i] = newwin(SQ_HEIGHT, SQ_WIDTH, start_y, start_x);
-    //     start_x += SQ_WIDTH;
-    // }
-    // start_x = 0;
-    // start_y = 2 * SQ_HEIGHT;
-    // for (i = 6; i < 9; i++) {
-    //     part->BOARD[i] = newwin(SQ_HEIGHT, SQ_WIDTH, start_y, start_x);
-    //     start_x += SQ_WIDTH;
-    // }
     part->CHAT = newwin(30, 70, 0, (info->size) * SQ_WIDTH);
     for (int i = 0; i < size_of_boar; i++) {
         draw_square(part->BOARD[i], 0, part);

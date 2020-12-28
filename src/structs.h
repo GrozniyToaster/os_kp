@@ -25,6 +25,7 @@
 #define PORT 4040
 
 typedef enum {
+    FIRST_CONNECT,
     REPLY,
     CONNECT,
     CHAT,
@@ -51,7 +52,7 @@ typedef struct {
 } message;
 
 typedef struct {
-    char board[3][3];
+    char** board;
     char my_side;
     bool is_my_turn;
     bool win;
