@@ -67,42 +67,7 @@ bool  check_board(core* c, int x, int y) {
     if (check_case(c, x, y, 1, -1)){
         return true;
     }
-    return false;
-
-    /*
-    // check horizontal
-    for (int i = 0; i < 3; i++) {
-        if (c->board[i][0] == c->board[i][1] &&
-            c->board[i][1] == c->board[i][2] &&
-            c->board[i][2] == c->my_side
-            ) {
-            return true;
-        }
-    }
-    // check columns
-    for (int i = 0; i < 3; i++) {
-        if (c->board[0][i] == c->board[1][i] &&
-            c->board[1][i] == c->board[2][i] &&
-            c->board[2][i] == c->my_side
-            ) {
-            return true;
-        }
-    }
-    // diagonals
-    if (c->board[0][0] == c->board[1][1] &&
-        c->board[1][1] == c->board[2][2] &&
-        c->board[2][2] == c->my_side
-        ) {
-        return true;
-    }
-    if (c->board[2][1] == c->board[1][1] &&
-        c->board[1][1] == c->board[0][2] &&
-        c->board[0][2] == c->my_side
-        ) {
-        return true;
-    }
-    return false;
-    */
+    return false; 
 }
 
 
